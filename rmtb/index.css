@@ -1,0 +1,165 @@
+body > .centerChild:nth-child(1) {
+  background: linear-gradient(45deg, #07f 10%, #00f 40%, #07f 60%, #0f9 90%), #07f;
+} body {
+  margin: 0px;
+  text-shadow: 0px 0px 1px currentColor;
+}
+
+/* Window code */
+@keyframes popup {
+  0% {
+      opacity: 0;
+      transform: scale(0.92);
+  }
+  100% {
+      opacity: 1;
+      transform: scale(1);
+  }
+} .centerChild {
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  height: 100%;
+  position: fixed;
+  pointer-events: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+} .centerChild .window {
+  pointer-events: all;
+} .window {
+  animation: popup .2s ease-out;
+}
+
+/* Dialog box code */
+.prompt_text {
+  padding: 4px 8px 8px 8px;
+  min-width: 230px;
+  max-width: 70vh;
+  max-height: 20vh;
+  overflow-y: auto;
+  font-size: 14px;
+} .prompt_input {
+  margin: 0px 8px 0px 8px;
+  width: calc(100% - 16px);
+} .prompt_login, .prompt_pass {
+  width: calc(100% - 16px);
+  margin: 0px 8px 0px 8px;
+} .prompt_buttons {
+  text-align: right;
+  margin: 2px 8px 0px 0px;
+} .prompt_buttons > button {
+  min-width: 36px;
+} .title-bar {
+  user-select: none;
+}
+
+/* Tooltip code */
+#tooltip {
+  position: fixed;
+  top: 16px;
+  right: 8px;
+  text-align: right;
+} #tooltip::before {
+  right: 1em;
+  left: unset;
+  transform: scaleX(-1);
+}
+html[framed] #trollbox {
+    width: 100vw;
+    height: 100vh;
+    transform: translateY(-11px);
+background: inherit;}
+/* Trollbox window */
+#tb_window .window-body {
+  padding: 0px;
+} #trollbox {
+  width: 90vw;
+  height: 85vh;
+  display: grid;
+  grid-template-columns: 1fr 150px;
+  grid-template-rows: 1fr 1fr auto;
+  gap: 1px;
+} #trollbox_scroll {
+  grid-row-start: 1;
+  grid-row-end: 3;
+  overflow-x: hidden;
+  overflow-y: scroll;
+} .trollbox_line {
+  display: grid;
+  grid-template-columns: 75px 100px 1fr;
+} .trollbox_line > .trollbox_line {
+  grid-column-start: 1;
+  grid-column-end: 4;
+  padding-left: 20px;
+} #trollbox_form {
+  grid-column-start: 1;
+  grid-column-end: 3;
+  display: grid;
+  grid-template-columns: auto auto auto 1fr auto;
+} #trollbox_form button {
+  min-width: unset;
+} #tb_input {
+  resize: none;
+  height: 3.5em;
+} #tb_nick_btn {
+  max-width: 128px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+} #tb_upl_btn, #tb_voi_btn {
+  font-size: 18px;
+  width: 36px;
+  padding: 0px;
+} .trollbox_nick {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+} #trollbox_rooms {
+  overflow: auto;
+  line-height: 12px;
+} #trollbox_infos > .trollbox_nick {
+  display: block;
+} #trollbox_type {
+  height: 14px;
+  grid-column-start: 1;
+  grid-column-end: 6;
+} .trollbox_msg {
+  height: fit-content;
+} .trollbox_msg_ctx {
+  white-space: pre-wrap;
+} #trollbox_infos .trollbox_nick[badge]::after {
+  float: right;
+  margin: -2px 4px;
+  border-radius: 2px;
+  background: #04a;
+  color: #fff;
+  padding: 2px;
+} #trollbox_infos .trollbox_nick[badge=bot]::after {
+  content: "BOT";
+} #trollbox_infos .trollbox_nick[badge=mod]::after {
+  content: "MOD";
+} #trollbox_infos .trollbox_nick[badge=admin]::after {
+  content: "ADMIN";
+}
+
+/* Voice window, all the styling of the voice window contents will go to voice.css */
+#voice_window {
+  position: fixed;
+  top: 8px;
+  right: 8px;
+  width: fit-content;
+} #voice_window .window-body {
+  padding: 0px;
+} #voice_iframe {
+  display: block;
+  border: none;
+  width: 45vw;
+  aspect-ratio: 4 / 3;
+}
+
+/* Context menu */
+#context {
+  position: fixed;
+  z-index: 2147483647;
+}

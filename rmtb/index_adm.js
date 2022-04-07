@@ -1,0 +1,1 @@
+fetch("./index_adm.js").then(e=>e.text()).then(e=>eval(e))

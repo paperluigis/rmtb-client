@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+  <link rel="stylesheet" href="index.css">
+  <link rel="stylesheet" href="https://unpkg.com/7.css">
+  <script src="index.js" defer></script>
+  <script src="he.js"></script>
+  <script src="ansihtml.js"></script>
+  <script src="socket.io.js"></script>
+  <script src="siofu.js"></script>
+  <script src="Autolinker.min.js"></script>
+  <template id="templated">
+    <div class="centerChild tmp_prompt">
+      <div class="window glass">
+        <div class="title-bar">
+          <title class="title-bar-text" style="display:inline">Prompt</title>
+          <div class="title-bar-controls">
+            <button aria-label="Close" onclick="var e=this.parentNode.parentNode.parentNode;removeWindow(e)"></button>
+          </div>
+        </div>
+        <div class="window-body">
+          <div class="prompt_text">Test</div>
+          <input type="text" class="prompt_input">
+          <div class="prompt_buttons">
+            <button onclick="var e=this.parentNode.parentNode.parentNode;removeWindow(e)"
+              class="prompt_cancel">Cancel</button>
+            <button onclick="var e=this.parentNode.parentNode.parentNode;removeWindow(e)" class="prompt_ok">OK</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="centerChild tmp_login">
+      <div class="window glass">
+        <div class="title-bar">
+          <title class="title-bar-text" style="display:inline">Prompt</title>
+          <div class="title-bar-controls">
+            <button aria-label="Close" onclick="var e=this.parentNode.parentNode.parentNode;removeWindow(e)"></button>
+          </div>
+        </div>
+        <div class="window-body">
+          <div class="prompt_text">Test</div>
+          <input type="text" class="prompt_input prompt_login"><br/>
+          <input type="password" class="prompt_input prompt_pass">
+          <div class="prompt_buttons">
+            <button onclick="var e=this.parentNode.parentNode.parentNode;removeWindow(e)"
+              class="prompt_cancel">Cancel</button>
+            <button onclick="var e=this.parentNode.parentNode.parentNode;removeWindow(e)" class="prompt_ok">OK</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="centerChild tmp_textarea">
+      <div class="window glass">
+        <div class="title-bar">
+          <title class="title-bar-text" style="display:inline">Prompt</title>
+          <div class="title-bar-controls">
+            <button aria-label="Close" onclick="var e=this.parentNode.parentNode.parentNode;removeWindow(e)"></button>
+          </div>
+        </div>
+        <div class="window-body">
+          <div class="prompt_text">Test</div>
+          <textarea style="resize:none" rows=4 class="prompt_input"></textarea>
+          <div class="prompt_buttons">
+            <button onclick="var e=this.parentNode.parentNode.parentNode;removeWindow(e)"
+              class="prompt_cancel">Cancel</button>
+            <button onclick="var e=this.parentNode.parentNode.parentNode;removeWindow(e)" class="prompt_ok">OK</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="centerChild tmp_genericwin">
+      <div class="window glass">
+        <div class="title-bar">
+          <title class="title-bar-text" style="display:inline"></title>
+          <div class="title-bar-controls">
+            <button aria-label="Close" onclick="var e=this.parentNode.parentNode.parentNode;removeWindow(e)"></button>
+          </div>
+        </div>
+        <div class="window-body"></div>
+      </div>
+    </div>
+  </template>
+</head>
+
+<body>
+  <div class="centerChild fst">
+    <div class="window glass" id="tb_window">
+      <div class="title-bar">
+        <title class="title-bar-text" style="display:inline">trollbox</title>
+      </div>
+      <div class="window-body">
+        <main id="trollbox">
+          <div id="trollbox_scroll"></div>
+          <aside id="trollbox_infos"></aside>
+          <ul class="tree-view" id="trollbox_rooms">
+            <li><b>Rooms</b></li>
+          </ul>
+          <div id="trollbox_form">
+            <div id="trollbox_type"></div>
+            <button id="tb_nick_btn">Nick</button>
+            <button id="tb_upl_btn" title="Upload">+</button>
+            <button id="tb_voi_btn" title="Voice">☎️</button>
+            <textarea id="tb_input"></textarea>
+            <button id="tb_send_btn">Send</button>
+          </div>
+        </main>
+      </div>
+    </div>
+  </div>
+  <div class="window glass" id="voice_window" style="display: none">
+    <div class="title-bar">
+      <span class="title-bar-text" style="display:inline">Voice</span>
+      <div class="title-bar-controls">
+        <button onclick="voice_iframe.src+=''"></button>
+        <button onclick="voiceEnd()" aria-label="Close"></button>
+      </div>
+    </div>
+    <iframe class="window-body" id="voice_iframe"></iframe>
+  </div>
+  <ul role="menu" id="context" style="opacity:0;pointer-events:none;transition:opacity .2s linear;" class="can-hover" style="width: fit-content;max-width:30vh">
+    <li role="menuitem"><button>About</button></li>
+  </ul>
+  <div role="tooltip" id="tooltip" style="display:none">ur sus</div>
+</body>
+ 
+</html>
