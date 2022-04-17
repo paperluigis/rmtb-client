@@ -172,7 +172,7 @@ socket.on("connect", () => {
 }).on("edited", (id, msg) => {
     let elt = document.getElementById("msg_" + id);
     if (elt) {
-        elt.children[0].innerHTML = he.encode(msg) + " <sub>(edited)</sub>";
+        elt.children[0].innerHTML = msg + " <sub>(edited)</sub>";
     }
 }).on("update users", (us) => {
     socket.emit("room_list");
