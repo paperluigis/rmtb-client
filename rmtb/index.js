@@ -1,5 +1,12 @@
-if(top!=self)document.getRootNode().children[0].setAttribute("framed", "")
+if(top!=self) {
+    document.getRootNode().children[0].setAttribute("framed", "")
+    document.body.appendChild(document.getElementById("trollbox"));
+    document.head.appendChild(document.querySelector("title"));
+    tb_window.parentNode.remove();
+}
 
+var nohtml = true;
+function optionalencode(x){x+="";return nohtml?he.encode(x):x}
 var u_pseudo = localStorage.getItem("user_pseudo");
 var u_color = localStorage.getItem("user_color");
 var u_style = localStorage.getItem("user_style");
@@ -172,7 +179,7 @@ socket.on("connect", () => {
 }).on("edited", (id, msg) => {
     let elt = document.getElementById("msg_" + id);
     if (elt) {
-        elt.children[0].innerHTML = msg + " <sub>(edited)</sub>";
+        elt.children[0].innerHTML = he.encode(msg) + " <sub>(edited)</sub>";
     }
 }).on("update users", (us) => {
     socket.emit("room_list");
@@ -186,13 +193,16 @@ socket.on("connect", () => {
 }).on("cmd", (js) => {
     inotif(`FCMD:<pre>${he.encode(js)}</pre><button onclick="eval(he.decode(this.parentNode.children[0].innerHTML));inotif_close()">Try to run</button>`)
 }).on("typing", (arr) => {
+    console.log(arr)
     if (scroll) trollbox_scroll.scrollTop = trollbox_scroll.scrollHeight;
     if (arr.length == 0) {
         trollbox_type.innerHTML = "";
     } else if (arr.length == 1) {
         trollbox_type.innerHTML = printNick(arr[0]).outerHTML + " is typing..."
     } else if (arr.length < 7) {
-        arr.forEach((sus, i) => {
+        for(let i=0;i<arr.length;i++){
+            let sus = arr[i];
+            if(!sus) return
             if (i == 0) {
                 trollbox_type.innerHTML = printNick(sus).outerHTML;
             } else if (i == arr.length - 1) {
@@ -200,7 +210,7 @@ socket.on("connect", () => {
             } else {
                 trollbox_type.innerHTML += ", " + printNick(sus).outerHTML
             }
-        });
+        }
     } else {
         trollbox_type.innerHTML = "Several people are typing..."
     }
@@ -315,6 +325,7 @@ function sendMsg(text) {
 <tr><td>/nick</td>    <td>changes nickname</td></tr>
 <tr><td>/color</td>   <td>changes color</td></tr>
 <tr><td>/clear</td>   <td>clear the chat</td></tr>
+<tr><td>/escape</td>  <td>encodes html into text</td></tr>
 <tr><td>/room, /r</td><td>switches rooms</td></tr>
 <tr><td>/who</td>     <td>list users by home</td></tr>
 <tr><td>/stat</td>    <td>displays how many bots, users and admins are connected</td></tr>
@@ -322,6 +333,9 @@ function sendMsg(text) {
                 break;
             case "clear":
                 trollbox_scroll.innerHTML = "";
+                break;
+            case "escape":
+                socket.send(he.encode(arg));
                 break;
             // passthrough server-side commands
             case "room": socket.send(text); break;
@@ -359,7 +373,7 @@ function sendMsg(text) {
     w.setAttribute("system", data.system ? "true" : "false");
     w.setAttribute("own", data.own ? "true" : "false");
     w.setAttribute("for", data.for + "");
-    w.innerHTML = `<div class="trollbox_msg_ctx">${aulk.link(data.msg)}</div>`;
+    w.innerHTML = `<div class="trollbox_msg_ctx">${aulk.link(optionalencode(data.msg))}</div>`;
     if (data.files) {
         console.log(data.files)
         let nm = data.files.name;
@@ -400,7 +414,7 @@ function sendMsg(text) {
     var w = document.createElement("span");
     w.classList.add("trollbox_nick");
     w.style.color = data.color.split(";")[0];
-    w.innerText = data.nick;
+    w.innerHTML = optionalencode(data.nick);
     w.setAttribute("sid", data.sid);
     w.setAttribute("hid", data.home);
     w.setAttribute("badge", data.admin ? "admin" : (data.mod ? "mod" : (data.bot ? "bot" : "")));
@@ -819,6 +833,7 @@ function elementDragging(elt, header) {
     header.addEventListener("mousedown", /** @param {MouseEvent} ev */ 
     function mst(ev){
         if(ev.target.tagName == "BUTTON") return
+            document.body.parentNode.classList.add("drag");
         /** @param {MouseEvent} evt */
         function mmv(evt){
             elt.style.left = evt.clientX - difX + "px";
@@ -826,6 +841,7 @@ function elementDragging(elt, header) {
         }
         /** @param {MouseEvent} evt */
         function me(evt){
+            document.body.parentNode.classList.remove("drag");
             document.removeEventListener("mousemove", mmv);
             document.removeEventListener("mouseup", me);
         }
@@ -853,6 +869,13 @@ function voiceEnd(){
     socket.off("getvoice");
     socket.off("get_voice_users");
     socket.emit("sendvoice", "syscall:reset", "syscall");
+    let b=50;
+    (function e(){
+        if(!b) return;
+        b--;
+        if(voice_iframe.contentWindow.stack0) voice_iframe.contentWindow.stack0.volume = b/50
+        setTimeout(e,1);
+    })()
     let q = voice_window.animate([{
         opacity: 1,
         transform: 'scale(1)'
