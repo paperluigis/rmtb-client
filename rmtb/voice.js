@@ -101,6 +101,7 @@ function loop() {
     ctx.fillStyle = "#000";
     ctx.clearRect(0, 0, disp.width, disp.height);
     if (stack0) {
+        stack0.playbackRate = 1
         if (stack0.videoWidth && stack0.videoHeight) {
             drawImageScaled(stack0, ctx);
         } else {

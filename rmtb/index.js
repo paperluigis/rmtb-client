@@ -5,7 +5,7 @@ if(top!=self) {
     tb_window.parentNode.remove();
 }
 
-var nohtml = true;
+var nohtml = localStorage.getItem("cfg_nohtml") == "true" ? true : false
 function optionalencode(x){x+="";return nohtml?he.encode(x):x}
 var u_pseudo = localStorage.getItem("user_pseudo");
 var u_color = localStorage.getItem("user_color");
@@ -13,7 +13,7 @@ var u_style = localStorage.getItem("user_style");
 var u_customst = localStorage.getItem("user_customst");
 var u_status = "on";
 var u_home = "";
-
+var blocked = JSON.parse(localStorage.getItem("cfg_blocked") || "[]");
 var socket = io("https://rmtrollbox.eu-gb.mybluemix.net");
 socket.disconnect();
 var scroll = true;
@@ -71,6 +71,7 @@ async function onClickChannel(name) {
     }
 }
 socket.on("connect", () => {
+    document.body.parentNode.classList.remove("disconnected")
     socket.emit("user joined", u_pseudo, u_color, u_style);
     socket.emit("set_status", u_status);
     if (u_customst) {
@@ -103,9 +104,13 @@ socket.on("connect", () => {
         igen("Disconnected", `<div class="prompt_text">You were kicked.</div><div class="prompt_buttons"><button onclick="removeWindow(this.parentNode.parentNode.parentNode);socket.connect()" class="prompt_ok">Reconnect</button></div>`).querySelector("button[aria-label=Close]").remove();
     } else if (reason == "io client disconnect") {
         igen("Disconnected", `<div class="prompt_text">You disconnected yourself.</div><div class="prompt_buttons"><button onclick="removeWindow(this.parentNode.parentNode.parentNode);socket.connect()" class="prompt_ok">Reconnect</button></div>`).querySelector("button[aria-label=Close]").remove();
+    } else if (reason == "ping timeout"){
+        document.body.parentNode.classList.add("disconnected")
     } else {
         inotif("You got disconnected with reason: " + reason);
     }
+}).on("connect_error", reason => {
+    inotif("Error connecting to the server: " + reason);
 }).on("room_update", function () {
     socket.emit("room_list");
 }).on("room_list_resp", function (c1, rooms) {
@@ -179,7 +184,7 @@ socket.on("connect", () => {
 }).on("edited", (id, msg) => {
     let elt = document.getElementById("msg_" + id);
     if (elt) {
-        elt.children[0].innerHTML = he.encode(msg) + " <sub>(edited)</sub>";
+        elt.children[0].innerHTML = optionalencode(msg) + " <sub>(edited)</sub>";
     }
 }).on("update users", (us) => {
     socket.emit("room_list");
@@ -214,9 +219,20 @@ socket.on("connect", () => {
     } else {
         trollbox_type.innerHTML = "Several people are typing..."
     }
+}).on("user change nick", ([prev,next]) => {
+    console.log(prev, next);
+    if(prev.nick == next.nick) return;
+    printMsg({
+        date: Date.now(),
+        system: true, own: false,
+        nick: "←", color: "#f00",
+        home: "local",
+        msg: printNick(prev).outerHTML + "<em> is now known as </em>" + printNick(next).outerHTML
+    });
 });
 
 // Event handlers: UI
+window.addEventListener("beforeunload", ()=>updateLocalStorage());
 window.addEventListener("blur", () => { focused = false });
 window.addEventListener("focus", () => { focused = true; title.innerHTML = "trollbox"; unreads = 0 });
 
@@ -239,12 +255,29 @@ tb_input.oninput = function () {
     sendMsg(tb_input.value);
     tb_input.value = "";
 }; tb_nick_btn.onclick = function () {
-    var am = igen("Settings", `<div style="display:grid;column-gap:4px;grid-template-columns: auto 1fr">
+    if(window._am){
+        window._am.animate({transform: [
+            "rotate(-1deg)",
+            "rotate(1deg)",
+            "rotate(-1deg)",
+            "rotate(1deg)",
+            "rotate(-1deg)",
+            "rotate(1deg)",
+            "rotate(-1deg)",
+            "rotate(1deg)",
+            "rotate(0deg)",
+            "rotate(0deg)",
+            "rotate(0deg)",
+        ]}, {duration: 500});
+    }
+    var am = window._am = window._am || igen("Settings", `<div style="display:grid;column-gap:4px;grid-template-columns: auto 1fr">
     <label>Nickname</label><input class="__2_nick" type="text" placeholder="anonymouse">
     <label>Color</label><input class="__2_color" type="text" placeholder="purple">
     <label>Custom status</label><textarea class="__2_customst" style="resize:none" rows=4></textarea>
     <label>Status</label><select class="__2_status"><option value="on">Online</option><option value="afk">Away From Keyboard</option><option value="dnd">Do Not Disturb</option></select>
-
+    <div style="grid-column-start:1;grid-column-end:3;">
+<input type="checkbox" id="duck2" style="width:0px;height:0px"><label for="duck2">Upload a file</label>
+</div>
 </div><div class="prompt_buttons" style="margin-right:0px"><button class="__cancel">Cancel</button> <button class="__apply">Apply</button> <button class="__ok">OK</button></div>`);
     var __nick = am.querySelector(".__2_nick");
     var __color = am.querySelector(".__2_color");
@@ -253,7 +286,10 @@ tb_input.oninput = function () {
     var __ok = am.querySelector(".__ok");
     var __apply = am.querySelector(".__apply");
     var __cancel = am.querySelector(".__cancel");
-
+    var __close = am.querySelector("button[aria-label=Close]");
+    __close.addEventListener("click", ()=>{
+        delete window._am;
+    })
     __nick.value = u_pseudo;
     __color.value = u_color;
     __customst.value = u_customst;
@@ -345,6 +381,7 @@ function sendMsg(text) {
         }
     } else socket.send(text);
 } function printMsg(data) {
+    if(blocked.includes(data.home)) return;
     if (!focused) unreads++, title.innerHTML = `trollbox (${unreads})`
     var q = document.createElement("span");
     q.classList.add("trollbox_line");
@@ -373,7 +410,10 @@ function sendMsg(text) {
     w.setAttribute("system", data.system ? "true" : "false");
     w.setAttribute("own", data.own ? "true" : "false");
     w.setAttribute("for", data.for + "");
-    w.innerHTML = `<div class="trollbox_msg_ctx">${aulk.link(optionalencode(data.msg))}</div>`;
+    if(data.system)
+        w.innerHTML = `<div class="trollbox_msg_ctx">${aulk.link(data.msg)}</div>`;
+    else
+        w.innerHTML = `<div class="trollbox_msg_ctx">${aulk.link(optionalencode(data.msg))}</div>`;
     if (data.files) {
         console.log(data.files)
         let nm = data.files.name;
@@ -417,6 +457,7 @@ function sendMsg(text) {
     w.innerHTML = optionalencode(data.nick);
     w.setAttribute("sid", data.sid);
     w.setAttribute("hid", data.home);
+    if(blocked.includes(data.home)) w.setAttribute("blocked", "")
     w.setAttribute("badge", data.admin ? "admin" : (data.mod ? "mod" : (data.bot ? "bot" : "")));
     if (!l) return w;
     w.title = data.customst || "";
@@ -616,6 +657,9 @@ function igen(title, html) {
     }, {
         duration: 5000
     });
+    tooltip.onclick=()=>{
+        tooltip.style.display = "none";
+    }
     if (!persist) {
         tooltip.onmouseenter = () => {
             lstanim.currentTime = 1000;
@@ -717,6 +761,7 @@ function updateLocalStorage() {
     localStorage.setItem("user_color", u_color);
     localStorage.setItem("user_style", u_style);
     localStorage.setItem("user_customst", u_customst);
+    localStorage.setItem("cfg_nohtml", nohtml);
 } function genColor(i) {
     q = ["green", "purple", "yellow", "blue", "lime", "red", "orange", "gold", "cyan"];
     i = Math.floor(i) % q.length;
@@ -732,7 +777,7 @@ function updateLocalStorage() {
     socket.connect();
 })();
 
-document.addEventListener("contextmenu", (ev) => {
+document.oncontextmenu = (ev) => {
     var elt = getClosestBySelector(ev.target, ".trollbox_nick, .trollbox_msg, img, video, audio");
     if (elt == null) return;
     var cls = Array.from(elt.classList);
@@ -745,6 +790,12 @@ document.addEventListener("contextmenu", (ev) => {
                     navigator.clipboard.writeText(elt.innerText)
                 },
                 disabled: false
+            }, {
+                name: "Copy HTML",
+                onclick() {
+                    navigator.clipboard.writeText(elt.innerHTML)
+                },
+                disabled: nohtml
             }, {
                 name: "Copy home ID",
                 onclick() {
@@ -774,6 +825,15 @@ document.addEventListener("contextmenu", (ev) => {
                         tb_input.value.substring(0, tb_input.selectionStart) + "@" + elt.innerText + tb_input.value.substring(tb_input.selectionEnd);
                     tb_input.focus();
                 }
+            }, {
+                name: blocked.includes(elt.getAttribute("hid")) ? "Unblock" : "Block",
+                onclick() {
+                    if(blocked.includes(elt.getAttribute("hid"))){
+                        blocked = blocked.filter(e=>e!=elt.getAttribute("hid"));
+                    } else {
+                        blocked.push(elt.getAttribute("hid"))
+                    }
+                }
             }
         ]);
     };
@@ -781,17 +841,17 @@ document.addEventListener("contextmenu", (ev) => {
         ev.preventDefault();
         ictxmenu(ev.clientX, ev.clientY, [
             {
-                name: "Copy HTML",
-                onclick() {
-                    navigator.clipboard.writeText(elt.children[0].innerHTML)
-                },
-                disabled: false
-            }, {
                 name: "Copy Text",
                 onclick() {
                     navigator.clipboard.writeText(elt.children[0].innerText);
                 },
                 disabled: false
+            }, {
+                name: "Copy HTML",
+                onclick() {
+                    navigator.clipboard.writeText(elt.children[0].innerHTML)
+                },
+                disabled: nohtml
             }, {
                 name: "Copy ID",
                 async onclick() {
@@ -823,8 +883,7 @@ document.addEventListener("contextmenu", (ev) => {
             }
         ]);
     };
-
-});
+};
 
 
 // Voice chat window

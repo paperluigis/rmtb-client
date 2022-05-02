@@ -1,8 +1,9 @@
+@import "darkmode.css";
+
 body > .centerChild:nth-child(1) {
   background: linear-gradient(45deg, #07f 10%, #00f 40%, #07f 60%, #0f9 90%), #07f;
 } body {
   margin: 0px;
-  text-shadow: 0px 0px 1px currentColor;
 }
 
 /* Window code */
@@ -115,13 +116,21 @@ html[framed] #trollbox {
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
+} .trollbox_nick[blocked]::before {
+  content:"❌";
+  font-size: 8px;
 } #trollbox_rooms {
   overflow: auto;
   line-height: 12px;
+} #trollbox_infos {
+  overflow: auto;
 } #trollbox_infos > .trollbox_nick {
   display: block;
 } #trollbox_type {
   height: 14px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   grid-column-start: 1;
   grid-column-end: 6;
 } .trollbox_msg {
@@ -130,7 +139,7 @@ html[framed] #trollbox {
   white-space: pre-wrap;
 } #trollbox_infos .trollbox_nick[badge]::after {
   float: right;
-  margin: -2px 4px;
+  margin: 0px 4px;
   border-radius: 4px;
   background: #04a;
   color: #fff;
@@ -163,4 +172,32 @@ html[framed] #trollbox {
 #context {
   position: fixed;
   z-index: 2147483647;
+}
+
+@keyframes notresponding {
+  0% { background: #0000 }
+  100% { background: #fff9 }
+}
+html.disconnected .window {
+  pointer-events: none;
+}
+html.disconnected .title-bar-text::after {
+  content: " (not responding)"
+}
+html.disconnected .window-body::after {
+  animation: notresponding 1s .3s ease-in both;
+  content: "";
+  display: block;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  top: 0px;
+  left: 0px;
+  position: absolute;
+}
+html.disconnected {
+  cursor: wait;
+}
+.window-body {
+  contain: paint layout;
 }
