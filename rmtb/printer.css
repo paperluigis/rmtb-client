@@ -1,0 +1,25 @@
+body {
+    margin: 0px;
+}
+#trollbox_infos {
+    position: fixed;
+    top: 1em;
+    left: 1em;
+    width: 10em;
+    background: #fff;
+    border: #000 solid .2em;
+}
+#trollbox_infos > .trollbox_nick {
+    
+}
+#trollbox_disconnect_bar, .window:not(#tb_window), .title-bar, 
+#trollbox_form {
+    display: none;
+}
+.trollbox_line {
+    display: grid;
+    grid-template-columns: 6em 6em 1fr
+}
+.trollbox_nick {
+    filter: contrast(5) brightness(.7);
+}

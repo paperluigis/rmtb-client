@@ -1,57 +1,143 @@
 /* 7.css fallback */
+body {
+    font: 13px tahoma, sans-serif;
+}
 .window {
-    border: 2px outset #aaa;
+    background: #07f8;
+    box-shadow: 1px 1px 8px 0px #07f8;
+    backdrop-filter: blur(4px);
+    border-radius: 2px 2px 0px 0px;
+    overflow: hidden;
 }
 .title-bar {
-    padding:2px 2px 2px 4px;
-    background:linear-gradient(90deg, #00f, #7cf);
     color: #fff;
-    border-bottom: 1px solid #777;
+    padding: 2px 4px;
     display: grid;
     place-items: center left;
     grid-template-columns: 1fr auto;
 }
 .title-bar-controls {
     display: flex;
+    position: sticky;
+    height: 100%;
+    overflow: hidden;
+    margin-top: -4px;
+    margin-right: -4px;
+    right: 0px;border-radius: 0px 0px 0px 2px;
 }
 .title-bar-controls>button {
-    margin-left: 1px;
-    padding: 0px;
-    height: 18px;
-    aspect-ratio: 1;
-    text-align: center;
-    line-height: 0px;
+    height: 100%;
+    width: 24px;
+    appearance: none;
+    background: #07f8;
+    border: none;
+    contain: layout;
 }
-.title-bar-controls>button[aria-label=Close]::before {
-    content: "X"
-}
-.title-bar-controls>button[aria-label=Minimize]::before {
-    content: "_"
+
+.title-bar-controls>button[aria-label=Close]{
+    width: 35px;
+    background: #f30a;
 }
 .window-body {
-    padding: 3px 8px;
-    color: #000;
-    background: silver;
+    background: #fffd;
+    margin: 0px 3px 3px;
+    padding: 8px;
 }
-body {
-    font: 12px sans-serif;
+body::before {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+    z-index: 200000;
+    color: #fff3;
+    filter: drop-shadow(1px 1px 1px #000);
+    content: "This is a fallback style.";
+    font-size: 30px;
+    animation-name: duck_881;
+    animation-fill-mode: forwards;animation-duration: 1s;
+    animation-delay: 6s;animation-timing-function: ease;
+    pointer-events: none;
 }
-* {
-    box-sizing: border-box;
+@keyframes duck_881 {
+    0% { opacity: 1 }
+    100% { opacity: 0 }
 }
-button {
+ul[role=menu] {
+    background: #333;
+    padding: 0px;
+    margin: 0px;
+    border: 1px solid #aaa;
+    box-shadow: 1px 1px 3px #000;
+}
+ul[role=menu]>li::marker {
+    content: none;
+}
+ul[role=menu]>li>button {
     appearance: none;
-    border: 2px outset #ccc;
-    background: #ddd;
+    width: 100%;
+    text-align: left;
+    border: none;
+    background: none;
+    color: #fff;
 }
-button:active {
-    border: 2px inset #ccc;
-    background: #aaa;
+ul[role=menu]>li.has-divider {
+    border-bottom: 1px solid #aaa;
 }
-div[role=tooltip] {
-    display: block !important;
-    background: silver;
-    padding: 8px 3px;
-    border: 1px solid #000;
-    filter: drop-shadow(0px 0px 4px #000) drop-shadow(3px 3px 1px #0009)
+ul[role=menu]>li>button:hover {
+    background: #00f6
+}
+ul[role=menu]>li>button:active {
+    background: #00f
+}
+ul.tree-view {
+    padding: 3px 8px;
+margin: 0px;}
+ul.tree-view li:marker {
+    content: none;
+}
+textarea {
+    font: inherit;
+    height: 2.5em;
+}
+#trollbox_form>button {
+    appearance: none;
+    border: none;
+    border-left: 1px solid #aaa;
+    border-top: 1px solid #aaa;
+    background: #0003;
+    color: #fff;
+}
+#trollbox_form>#trollbox_type + button {
+    border-left: none;
+}
+#tb_input {
+    height: 1.5em;
+    outline: none !important;
+    border: none;
+    border-top: 1px solid #aaa;
+    border-left: 1px solid #aaa;
+    background: #0003;
+    color: #fff;
+}
+[role=tooltip]{
+    padding: 3px 8px;
+    border: 1px solid #333;
+    box-shadow: 2px 2px 4px #000;
+    border-radius: 4px;
+    background: #ccc;
+}
+#trollbox_disconnect_bar {
+    height: 24px;
+}
+
+#tb_conn_btn {
+    appearance: none;
+    border: none;
+    background: none;
+    border-radius: 8px 0px 0px 0px;
+    border-top: 1px solid #aaa;
+    border-left: 1px solid #aaa;
+    height: 100%;
+    background: #0003;
+    color: #fff;
 }

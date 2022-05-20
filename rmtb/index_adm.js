@@ -1,1 +1,3 @@
-fetch("./index_adm.js").then(e=>e.text()).then(e=>eval(e))
+ilogin("Admin login?", localStorage["adm_login"], localStorage["adm_pass"]).then(e=>{
+    if(!e) window.adminmode = false
+})

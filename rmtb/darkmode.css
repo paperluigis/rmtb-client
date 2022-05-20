@@ -11,13 +11,14 @@ body > .centerChild:nth-child(1) {
 
 ::-webkit-scrollbar {
     width: 8px !important;
+    height: 8px !important;
 }
 ::-webkit-scrollbar-track {
     background: #222 !important;
 }
 ::-webkit-scrollbar-thumb {
     background: #333 !important;
-    box-shadow: none !important;
+    box-shadow: inset 0px 0px 2px 2px #444 !important;
 }
 ::-webkit-scrollbar-button {
     display: none !important;
