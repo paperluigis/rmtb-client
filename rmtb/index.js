@@ -31,7 +31,7 @@ var u_customst = localStorage.getItem("user_customst");
 var u_status = "on";
 var u_home = "";
 var blocked = JSON.parse(localStorage.getItem("cfg_blocked") || "[]");
-var socket = io("https://rmtrollbox.eu-gb.mybluemix.net", {
+var socket = io("https://rmtrollbox.sussite.tk/", {
     reconnection: false
 });
 // (()=>{
